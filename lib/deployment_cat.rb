@@ -171,7 +171,7 @@ File.open(dep.name.gsub(/[^\w\s_-]+/, '')+'.cat','w') do |f|
 
   # Output the metadata of this CloudApp
   f.puts "name '"+dep.name.gsub(/\'/,"\\\\'")+"'"
-  f.puts "rs_ca_ver 20131024"
+  f.puts "rs_ca_ver 20131202"
   f.puts "short_description '"+dep.description.gsub(/\'/,"\\\\'")+"'"
 
   # For each Server in the deployment (regardless of its status)

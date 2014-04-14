@@ -1,6 +1,5 @@
 require "rubygems"
-#require "right_api_client"
-require File.expand_path('../../../../repos/rightscale/right_api_client/lib/right_api_client', __FILE__)
+require "right_api_client"
 require File.expand_path('../lib/deployment_cat', __FILE__)
 
 require "optparse"
