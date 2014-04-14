@@ -11,10 +11,13 @@ A Ruby library to convert RightScale Deployments to CAT format
 
 ## Usage
 
+    ruby export_deployment.rb -d [deployment_id] -e [email] -p [password] -a [account_id]
+
     -d, --deployment ID              Deployment ID
     -e, --email EMAIL_ADDRESS        Email Address
     -p, --password PASSWORD          Password
     -a, --account ID                 Account ID
+    -h, --help						 Show Help screen
 
 ## Details
 
