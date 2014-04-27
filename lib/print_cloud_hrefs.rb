@@ -1,4 +1,4 @@
-def print_cloud_details( c )
+def print_cloud_details( c, include_images )
 
   c.clouds.index.each do |cloud|
     
@@ -51,13 +51,13 @@ def print_cloud_details( c )
       end
     end
 
-    # if !cloud.raw["links"].detect{ |l| l["rel"] == "images"}.nil?
+    if include_images && !cloud.raw["links"].detect{ |l| l["rel"] == "images"}.nil?
 
-    #   puts "== IMAGES"
-    #   cloud.show.images.index.each do |d|
-    #     puts d.name + " - " + d.href
-    #   end
-    # end
+      puts "  == IMAGES"
+      cloud.show.images.index.each do |d|
+        puts "    " + d.name + " - " + d.href
+      end
+    end
 
     puts ""
 
