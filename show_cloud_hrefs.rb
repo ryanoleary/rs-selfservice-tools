@@ -1,7 +1,6 @@
 require "rubygems"
-#require "right_api_client"
+require "right_api_client"
 require File.expand_path('../lib/print_cloud_hrefs', __FILE__)
-require File.expand_path('../../../../repos/rightscale/right_api_client/lib/right_api_client', __FILE__)
 
 
 
