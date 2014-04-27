@@ -1,8 +1,10 @@
-# Deployment to CAT
+# RightScale SelfService Tools
 
 ## Description
 
-A Ruby library to convert RightScale Deployments to CAT format
+Provides a small set of tools to help you use RS Self Service
+ - A Ruby library and command line tool to convert RightScale Deployments to CAT format
+ - A command line tool to generate a human-readable list of hrefs in use in your account
 
 ## Requirements
 
@@ -11,17 +13,26 @@ A Ruby library to convert RightScale Deployments to CAT format
 
 ## Usage
 
-    ruby export_deployment.rb -d [deployment_id] -e [email] -p [password] -a [account_id]
+### Deployment to CAT
+Export all resources in an existing deployment to a CAT file format
 
+    ruby export_deployment.rb <options>
     -d, --deployment ID              Deployment ID
     -e, --email EMAIL_ADDRESS        Email Address
     -p, --password PASSWORD          Password
     -a, --account ID                 Account ID
-    -h, --help						 Show Help screen
 
-## Details
+Notes: Subnets and SecurityGroups are not exported due to [this bug](http://bit.ly/1f7AEZa)
 
-Exports all Servers in a Deployment to CAT format using the next_instance details. Includes support for all parameters of Servers and ServerArrays (note: Subnets and SecurityGroups will only be exported when using a hacked version of RightApiClient that represents them as links due to [this bug](http://bit.ly/1f7AEZa))
+### Show Cloud Hrefs
+Print a readable list of all resource hrefs for all cloud resources in an account
+
+		ruby show_cloud_hrefs.rb <options>
+    -e, --email EMAIL_ADDRESS        Email Address
+    -p, --password PASSWORD          Password
+    -a, --account ID                 Account ID
+
+Note: Subnets and SecurityGroups are not supported at this time
 
 ## Todo
 

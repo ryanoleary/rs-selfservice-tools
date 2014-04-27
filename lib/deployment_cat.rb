@@ -69,36 +69,43 @@ def instance_details_to_cat( ni )
     st = ni.server_template.show(:view=>"inputs_2_0")
 
     str = ""
-    str += "  cloud '"+ni.cloud.show.name.gsub(/\'/,"\\\\'")+"'\n"
+    str += "  # cloud '"+ni.cloud.show.name.gsub(/\'/,"\\\\'")+"'\n"
+    str += "  cloud_href '"+ni.cloud.show.href+"'\n"
     
     # Check to see if there is a datacenter link to export
     if !ni.raw["links"].detect{ |l| l["rel"] == "datacenter" && l["inherited_source"] == nil}.nil?
-      str += "  datacenter '"+ni.datacenter.show.name.gsub(/\'/,"\\\\'")+"'\n"
+      str += "  # datacenter '"+ni.datacenter.show.name.gsub(/\'/,"\\\\'")+"'\n"
+      str += "  datacenter_href '"+ni.datacenter.show.href+"'\n"
     end
 
     # Check to see if there is a image link to export
     if !ni.raw["links"].detect{ |l| l["rel"] == "image" && l["inherited_source"] == nil}.nil?
-      str += "  image '"+ni.image.show.name.gsub(/\'/,"\\\\'")+"'\n"
+      str += "  # image '"+ni.image.show.name.gsub(/\'/,"\\\\'")+"'\n"
+      str += "  image_href '"+ni.image.show.href+"'\n"
     end
 
     # Check to see if there is an instance type link to export
     if !ni.raw["links"].detect{ |l| l["rel"] == "instance_type" && l["inherited_source"] == nil}.nil?
-      str += "  instance_type '"+ni.instance_type.show.name.gsub(/\'/,"\\\\'")+"'\n"
+      str += "  # instance_type '"+ni.instance_type.show.name.gsub(/\'/,"\\\\'")+"'\n"
+      str += "  instance_type_href '"+ni.instance_type.show.href+"'\n"
     end 
 
     # Check to see if there is an kernel type link to export
-    if !ni.raw["links"].detect{ |l| l["rel"] == "kernel_type" && l["inherited_source"] == nil}.nil?
-      str += "  kernel_type '"+ni.kernel_type.show.name.gsub(/\'/,"\\\\'")+"'\n"
+    if !ni.raw["links"].detect{ |l| l["rel"] == "kernel_image" && l["inherited_source"] == nil}.nil?
+      str += "  # kernel_image '"+ni.kernel_image.show.name.gsub(/\'/,"\\\\'")+"'\n"
+      str += "  kernel_image_href '"+ni.kernel_image.show.href+"'\n"
     end 
 
     # Check to see if there is an multi cloud image link to export
     if !ni.raw["links"].detect{ |l| l["rel"] == "multi_cloud_image" && l["inherited_source"] == nil}.nil?
-      str += "  multi_cloud_image '"+ni.multi_cloud_image.show.name.gsub(/\'/,"\\\\'")+"'\n"
+      str += "  # multi_cloud_image '"+ni.multi_cloud_image.show.name.gsub(/\'/,"\\\\'")+"'\n"
+      str += "  multi_cloud_image_href '"+ni.multi_cloud_image.show.href+"'\n"
     end 
 
     # Check to see if there is an multi cloud image link to export
     if !ni.raw["links"].detect{ |l| l["rel"] == "ramdisk_image" && l["inherited_source"] == nil}.nil?
-      str += "  ramdisk_image '"+ni.ramdisk_image.show.name.gsub(/\'/,"\\\\'")+"'\n"
+      str += "  # ramdisk_image '"+ni.ramdisk_image.show.name.gsub(/\'/,"\\\\'")+"'\n"
+      str += "  ramdisk_image_href '"+ni.ramdisk_image.show.href+"'\n"
     end 
 
     if !ni.user_data.nil?
@@ -110,7 +117,7 @@ def instance_details_to_cat( ni )
     #  This is only populated using a hacked r_a_c 
     #  The hack may return a single subnets link, or an array of links, so we have to check for that
     if !ni.raw["links"].detect{ |l| l["rel"] == "subnets"}.nil?
-      str += "  subnets "
+      str += "  # subnets "
       if ni.subnets.kind_of?(Array)
         ni.subnets.each_with_index do |s,i|
           str += "'"+s.show.name.gsub(/\'/,"\\\\'")+"'"
@@ -122,6 +129,20 @@ def instance_details_to_cat( ni )
         str += "'"+ni.subnets.show.name.gsub(/\'/,"\\\\'")+"'"
       end
       str += "\n"
+
+      str += "  subnet_hrefs "
+      if ni.subnets.kind_of?(Array)
+        ni.subnets.each_with_index do |s,i|
+          str += "'"+s.show.href+"'"
+          if i+1 != ni.subnets.size
+            str += ", "
+          end
+        end
+      else
+        str += "'"+ni.subnets.show.href+"'"
+      end
+      str += "\n"
+
     end 
 
     # Check to see if there is a security_groups link
@@ -129,7 +150,7 @@ def instance_details_to_cat( ni )
     #  This is only populated using a hacked r_a_c 
     #  The hack may return a single security_groups link, or an array of links, so we have to check for that
     if !ni.raw["links"].detect{ |l| l["rel"] == "security_groups"}.nil?
-      str += "  security_groups "
+      str += "  # security_groups "
       if ni.security_groups.kind_of?(Array)
         ni.security_groups.each_with_index do |s,i|
           str += "'"+s.show.name.gsub(/\'/,"\\\\'")+"'"
@@ -141,10 +162,25 @@ def instance_details_to_cat( ni )
         str += "'"+ni.security_groups.show.name.gsub(/\'/,"\\\\'")+"'"
       end
       str += "\n"
+
+      str += "  security_group_hrefs "
+      if ni.security_groups.kind_of?(Array)
+        ni.security_groups.each_with_index do |s,i|
+          str += "'"+s.show.href+"'"
+          if i+1 != ni.security_groups.size
+            str += ", "
+          end
+        end
+      else
+        str += "'"+ni.security_groups.show.href+"'"
+      end
+      str += "\n"
+
     end 
 
     # Output the server template information
-    str += "  server_template find('"+st.name.gsub(/\'/,"\\\\'")+"', revision: "+st.revision.to_s()+")\n"
+    str += "  # server_template find('"+st.name.gsub(/\'/,"\\\\'")+"', revision: "+st.revision.to_s()+")\n"
+    str += "  server_template_href '"+st.href+"'\n"
 
     # For each input, check to see if this input is in the ServerTemplate with the same value
     #  If so, skip it, since it appears to be inherited anyway
