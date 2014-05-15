@@ -117,19 +117,6 @@ def instance_details_to_cat( ni )
     #  This is only populated using a hacked r_a_c 
     #  The hack may return a single subnets link, or an array of links, so we have to check for that
     if !ni.raw["links"].detect{ |l| l["rel"] == "subnets"}.nil?
-      str += "  # subnets "
-      if ni.subnets.kind_of?(Array)
-        ni.subnets.each_with_index do |s,i|
-          str += "'"+s.show.name.gsub(/\'/,"\\\\'")+"'"
-          if i+1 != ni.subnets.size
-            str += ", "
-          end
-        end
-      else
-        str += "'"+ni.subnets.show.name.gsub(/\'/,"\\\\'")+"'"
-      end
-      str += "\n"
-
       str += "  subnet_hrefs "
       if ni.subnets.kind_of?(Array)
         ni.subnets.each_with_index do |s,i|
@@ -150,19 +137,6 @@ def instance_details_to_cat( ni )
     #  This is only populated using a hacked r_a_c 
     #  The hack may return a single security_groups link, or an array of links, so we have to check for that
     if !ni.raw["links"].detect{ |l| l["rel"] == "security_groups"}.nil?
-      str += "  # security_groups "
-      if ni.security_groups.kind_of?(Array)
-        ni.security_groups.each_with_index do |s,i|
-          str += "'"+s.show.name.gsub(/\'/,"\\\\'")+"'"
-          if i+1 != ni.security_groups.size
-            str += ", "
-          end
-        end
-      else
-        str += "'"+ni.security_groups.show.name.gsub(/\'/,"\\\\'")+"'"
-      end
-      str += "\n"
-
       str += "  security_group_hrefs "
       if ni.security_groups.kind_of?(Array)
         ni.security_groups.each_with_index do |s,i|
