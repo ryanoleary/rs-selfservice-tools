@@ -112,45 +112,25 @@ def instance_details_to_cat( ni )
       str += "  user_data '"+ni.user_data.gsub(/\'/,"\\\\'")+"'\n"
     end
 
-    # Check to see if there is a subnets link
-    # Note: this will never be populated using existing right_api_client (1.5.15) gem
-    #  This is only populated using a hacked r_a_c 
-    #  The hack may return a single subnets link, or an array of links, so we have to check for that
-    if !ni.raw["links"].detect{ |l| l["rel"] == "subnets"}.nil?
+    # Subnets and security groups aren't proper links in right_api_client, so instead
+    #  just use the href values for these
+    if !ni.raw["subnets"].nil?
       str += "  subnet_hrefs "
-      if ni.subnets.kind_of?(Array)
-        ni.subnets.each_with_index do |s,i|
-          str += "'"+s.show.href+"'"
-          if i+1 != ni.subnets.size
-            str += ", "
-          end
-        end
-      else
-        str += "'"+ni.subnets.show.href+"'"
+      ni.raw["subnets"].each do |sn|
+        str += "'" + sn["href"] + "', "
       end
       str += "\n"
+    end
 
-    end 
-
-    # Check to see if there is a security_groups link
-    # Note: this will never be populated using existing right_api_client (1.5.15) gem
-    #  This is only populated using a hacked r_a_c 
-    #  The hack may return a single security_groups link, or an array of links, so we have to check for that
-    if !ni.raw["links"].detect{ |l| l["rel"] == "security_groups"}.nil?
+    # Subnets and security groups aren't proper links in right_api_client, so instead
+    #  just use the href values for these
+    if !ni.raw["security_groups"].nil?
       str += "  security_group_hrefs "
-      if ni.security_groups.kind_of?(Array)
-        ni.security_groups.each_with_index do |s,i|
-          str += "'"+s.show.href+"'"
-          if i+1 != ni.security_groups.size
-            str += ", "
-          end
-        end
-      else
-        str += "'"+ni.security_groups.show.href+"'"
+      ni.raw["security_groups"].each do |sn|
+        str += "'" + sn["href"] + "', "
       end
       str += "\n"
-
-    end 
+    end
 
     # Output the server template information
     str += "  # server_template find('"+st.name.gsub(/\'/,"\\\\'")+"', revision: "+st.revision.to_s()+")\n"
