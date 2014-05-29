@@ -108,7 +108,7 @@ def instance_details_to_cat( ni )
       str += "  ramdisk_image_href '"+ni.ramdisk_image.show.href+"'\n"
     end 
 
-    if !ni.user_data.nil?
+    if !ni.user_data.nil? && ni.user_data != ''
       str += "  user_data '"+ni.user_data.gsub(/\'/,"\\\\'")+"'\n"
     end
 
