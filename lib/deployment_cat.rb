@@ -24,15 +24,21 @@ def server_array_to_cat( sa, rname )
       str += "  state '"+sa.state+"'\n"
     end
     
-    str += "  elasticity_params do\n"
-    str += "    { 'min_count'            => "+sa.elasticity_params["bounds"]["min_count"]+",\n"
-    str += "      'max_count'            => "+sa.elasticity_params["bounds"]["max_count"]+",\n"
+    str += "  elasticity_params do {\n"
+    str += "    'bounds' => {\n"
+    str += "      'min_count'            => "+sa.elasticity_params["bounds"]["min_count"]+",\n"
+    str += "      'max_count'            => "+sa.elasticity_params["bounds"]["max_count"]+"\n"
+    str += "    },\n"
+    str += "    'pacing' => {\n"
     str += "      'resize_calm_time'     => "+sa.elasticity_params["pacing"]["resize_calm_time"]+",\n"
     str += "      'resize_down_by'       => "+sa.elasticity_params["pacing"]["resize_down_by"]+",\n"
-    str += "      'resize_up_by'         => "+sa.elasticity_params["pacing"]["resize_up_by"]+",\n"
+    str += "      'resize_up_by'         => "+sa.elasticity_params["pacing"]["resize_up_by"]+"\n"
+    str += "    },\n"
+    str += "    'alert_specific_params' => {\n"
     str += "      'decision_threshold'   => "+sa.elasticity_params["alert_specific_params"]["decision_threshold"]+",\n"
-    str += "      'voters_tag_predicate' => '"+sa.elasticity_params["alert_specific_params"]["voters_tag_predicate"]+"' }\n"
-    str += "  end\n"
+    str += "      'voters_tag_predicate' => '"+sa.elasticity_params["alert_specific_params"]["voters_tag_predicate"]+"'\n"
+    str += "    }\n"
+    str += "  } end\n"
 
     str += "end\n"
     str
