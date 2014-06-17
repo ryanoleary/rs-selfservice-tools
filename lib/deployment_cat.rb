@@ -120,10 +120,11 @@ def instance_details_to_cat( ni )
 
     # Subnets and security groups aren't proper links in right_api_client, so instead
     #  just use the href values for these
-    if !ni.raw["subnets"].nil?
+    if !ni.raw["subnets"].nil? && ni.raw["subnets"].size > 0
       str += "  subnet_hrefs "
-      ni.raw["subnets"].each do |sn|
-        str += "'" + sn["href"] + "', "
+      ni.raw["subnets"].each_with_index do |sn, i|
+        str += "'" + sn["href"] + "'"
+        str += ", " if i != ni.raw["subnets"].size - 1
       end
       str += "\n"
     end
@@ -132,9 +133,10 @@ def instance_details_to_cat( ni )
     #  just use the href values for these
     if !ni.raw["security_groups"].nil?
       str += "  security_group_hrefs "
-      ni.raw["security_groups"].each do |sn|
-        str += "'" + sn["href"] + "', "
-      end
+      ni.raw["security_groups"].each_with_index do |sn, i|
+        str += "'" + sn["href"] + "'"
+        str += ", " if i != ni.raw["security_groups"].size - 1
+    end
       str += "\n"
     end
 
@@ -163,7 +165,7 @@ dep = client.deployments(:id=>deployment_id).show
 puts "Exporting Deployment: " + dep.name
 
 # Output to a file named after the deployment (cleaned up for Linux filenames)
-File.open(dep.name.gsub(/[^\w\s_-]+/, '')+'.cat','w') do |f|
+File.open(dep.name.gsub(/[^\w\s_-]+/, '')+'.cat.rb','w') do |f|
 
   # Output the metadata of this CloudApp
   f.puts "name '"+dep.name.gsub(/\'/,"\\\\'")+"'"
@@ -177,7 +179,7 @@ File.open(dep.name.gsub(/[^\w\s_-]+/, '')+'.cat','w') do |f|
 
     rname = "server_"+(scount+=1).to_s
     f.puts(server_to_cat(s, rname))
-
+    f.flush
   end
 
   serverarrays = dep.server_arrays.index
@@ -186,7 +188,7 @@ File.open(dep.name.gsub(/[^\w\s_-]+/, '')+'.cat','w') do |f|
 
     rname = "server_array_"+(scount+=1).to_s
     f.puts(server_array_to_cat(sa, rname))
-
+    f.flush
   end
 end
 
