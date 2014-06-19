@@ -150,7 +150,7 @@ def instance_details_to_cat( ni )
     str += "  inputs do {\n"
     inputs.each do |i|
       if st.raw["inputs"].find{ |sti| sti["name"] == i.name && sti["value"] == i.value }.nil?  
-        str += "    '"+i.name+"' => '"+i.value.gsub(/\'/,"\\\\'")+"',\n"
+        str += "    '"+i.name+"' => '"+i.value.gsub(/\'/,"\\\\'")+"',\n" if i.value != "blank"
       end
     end 
     str += "  } end\n"
