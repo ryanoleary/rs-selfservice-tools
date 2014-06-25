@@ -23,6 +23,10 @@ def server_array_to_cat( sa, rname )
     if sa.raw["state"]
       str += "  state '"+sa.state+"'\n"
     end
+
+    if sa.raw["array_type"]
+      str += "  array_type '"+sa.array_type+"'\n"
+    end
     
     str += "  elasticity_params do {\n"
     str += "    'bounds' => {\n"

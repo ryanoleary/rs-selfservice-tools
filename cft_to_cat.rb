@@ -11,9 +11,9 @@ options = {}
 OptionParser.new do |opts|
   opts.banner = "Usage: export_deployment [options]"
 
-  opts.on("-f", "--file FILE_NAME", "Filename") { |v| options[:filename] = v }
+  opts.on("-f", "--file FILE_NAME", "Filename of the CFT file") { |v| options[:filename] = v }
 
-  opts.on( "-h:", "--help", "Display this screen" ) do
+  opts.on( "-h", "--help", "Display this screen" ) do
      puts opts
      exit
   end

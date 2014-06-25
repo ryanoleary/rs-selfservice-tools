@@ -16,7 +16,7 @@ OptionParser.new do |opts|
   opts.on("-a", "--account ID", "Account ID") { |v| options[:account_id] = v }
   opts.on("-i", "--include_images", "Include image hrefs (can be many)" ) { |v| options[:images] = v }
 
-  opts.on( "-h:", "--help", "Display this screen" ) do
+  opts.on( "-h", "--help", "Display this screen" ) do
      puts opts
      exit
   end

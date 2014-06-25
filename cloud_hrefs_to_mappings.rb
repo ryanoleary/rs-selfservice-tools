@@ -12,7 +12,7 @@ OptionParser.new do |opts|
   opts.on("-p", "--password PASSWORD", "Password") { |v| options[:password] = v }
   opts.on("-a", "--account ID", "Account ID") { |v| options[:account_id] = v }
 
-  opts.on( "-h:", "--help", "Display this screen" ) do
+  opts.on( "-h", "--help", "Display this screen" ) do
      puts opts
      exit
   end
