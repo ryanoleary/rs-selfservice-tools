@@ -112,12 +112,19 @@ def instance_details_to_cat( ni )
       str += "  multi_cloud_image_href '"+ni.multi_cloud_image.show.href+"'\n"
     end 
 
-    # Check to see if there is an multi cloud image link to export
+    # Check to see if there is an ramdisk image link to export
     if !ni.raw["links"].detect{ |l| l["rel"] == "ramdisk_image" && l["inherited_source"] == nil}.nil?
       str += "  # ramdisk_image '"+ni.ramdisk_image.show.name.gsub(/\'/,"\\\\'")+"'\n"
       str += "  ramdisk_image_href '"+ni.ramdisk_image.show.href+"'\n"
     end 
 
+    # Check to see if there is an ssh key link to export
+    if !ni.raw["links"].detect{ |l| l["rel"] == "ssh_key" }.nil?
+      str += "  # ssh_key '"+ni.ssh_key.show.resource_uid.gsub(/\'/,"\\\\'")+"'\n"
+      str += "  ssh_key_href '"+ni.ssh_key.show.href+"'\n"
+    end 
+
+    # Export the user_data if it's not blank
     if !ni.user_data.nil? && ni.user_data != ''
       str += "  user_data '"+ni.user_data.gsub(/\'/,"\\\\'")+"'\n"
     end
