@@ -64,6 +64,7 @@ def server_to_cat( s, rname )
     ni = s.show.next_instance.show(:view=>"full")
 
     str += instance_details_to_cat(ni)
+    str += server_template_details_to_cat(ni)
 
     if s.raw["optimized"]
       str += "  optimized '"+s.optimized+"'\n"
@@ -73,55 +74,95 @@ def server_to_cat( s, rname )
     str
 end
 
+def instance_to_cat( i, rname )
 
-def instance_details_to_cat( ni )
+    puts "  Instance: " + i.name
+
+    str = ""
+    # Some of the basic resource information
+    str += "resource '"+rname+"', type: 'instance' do\n"
+    str += "  name '"+i.name.gsub(/\'/,"\\\\'")+"'\n"
+    if !i.description.nil? 
+      str += "  description '"+i.description.gsub(/\'/,"\\\\'")+"'\n"
+    end
+
+    str += instance_details_to_cat(i)
+
+    str += "end\n"
+    str
+end
+
+def server_template_details_to_cat( ni )
 
     st = ni.server_template.show(:view=>"inputs_2_0")
 
     str = ""
-    str += "  # cloud '"+ni.cloud.show.name.gsub(/\'/,"\\\\'")+"'\n"
-    str += "  cloud_href '"+ni.cloud.show.href+"'\n"
-    
+    # Output the server template information
+    str += "  server_template find('"+st.name.gsub(/\'/,"\\\\'")+"', revision: "+st.revision.to_s()+")\n"
+    # str += "  server_template_href '"+st.href+"'\n"
+
+    # For each input, check to see if this input is in the ServerTemplate with the same value
+    #  If so, skip it, since it appears to be inherited anyway
+    inputs = ni.inputs.index(:view=>"inputs_2_0")
+    str += "  inputs do {\n"
+    inputs.each do |i|
+      if st.raw["inputs"].find{ |sti| sti["name"] == i.name && sti["value"] == i.value }.nil?  
+        str += "    '"+i.name+"' => '"+i.value.gsub(/\'/,"\\\\'")+"',\n" if i.value != "blank"
+      end
+    end 
+    str += "  } end\n"
+
+    str
+
+end
+
+def instance_details_to_cat( ni )
+
+    str = ""
+    str += "  cloud '"+ni.cloud.show.name.gsub(/\'/,"\\\\'")+"'\n"
+    #str += "  cloud_href '"+ni.cloud.show.href+"'\n"
+    cloud_href = ni.cloud.show.href
+
     # Check to see if there is a datacenter link to export
     if !ni.raw["links"].detect{ |l| l["rel"] == "datacenter" && l["inherited_source"] == nil}.nil?
-      str += "  # datacenter '"+ni.datacenter.show.name.gsub(/\'/,"\\\\'")+"'\n"
-      str += "  datacenter_href '"+ni.datacenter.show.href+"'\n"
+      str += "  datacenter find('"+ni.datacenter.show.name.gsub(/\'/,"\\\\'")+"', cloud_href: '" + cloud_href + "')\n"
+      # str += "  datacenter_href '"+ni.datacenter.show.href+"'\n"
     end
 
     # Check to see if there is a image link to export
     if !ni.raw["links"].detect{ |l| l["rel"] == "image" && l["inherited_source"] == nil}.nil?
-      str += "  # image '"+ni.image.show.name.gsub(/\'/,"\\\\'")+"'\n"
-      str += "  image_href '"+ni.image.show.href+"'\n"
+      str += "  image find('"+ni.image.show.name.gsub(/\'/,"\\\\'")+"', cloud_href: '" + cloud_href + "')\n"
+      # str += "  image_href '"+ni.image.show.href+"'\n"
     end
 
     # Check to see if there is an instance type link to export
     if !ni.raw["links"].detect{ |l| l["rel"] == "instance_type" && l["inherited_source"] == nil}.nil?
-      str += "  # instance_type '"+ni.instance_type.show.name.gsub(/\'/,"\\\\'")+"'\n"
-      str += "  instance_type_href '"+ni.instance_type.show.href+"'\n"
+      str += "  instance_type find('"+ni.instance_type.show.name.gsub(/\'/,"\\\\'")+"', cloud_href: '" + cloud_href + "')\n"
+      # str += "  instance_type_href '"+ni.instance_type.show.href+"'\n"
     end 
 
     # Check to see if there is an kernel type link to export
     if !ni.raw["links"].detect{ |l| l["rel"] == "kernel_image" && l["inherited_source"] == nil}.nil?
-      str += "  # kernel_image '"+ni.kernel_image.show.name.gsub(/\'/,"\\\\'")+"'\n"
-      str += "  kernel_image_href '"+ni.kernel_image.show.href+"'\n"
+      str += "  kernel_image find('"+ni.kernel_image.show.name.gsub(/\'/,"\\\\'")+"', cloud_href: '" + cloud_href + "')\n"
+      # str += "  kernel_image_href '"+ni.kernel_image.show.href+"'\n"
     end 
 
     # Check to see if there is an multi cloud image link to export
     if !ni.raw["links"].detect{ |l| l["rel"] == "multi_cloud_image" && l["inherited_source"] == nil}.nil?
-      str += "  # multi_cloud_image '"+ni.multi_cloud_image.show.name.gsub(/\'/,"\\\\'")+"'\n"
-      str += "  multi_cloud_image_href '"+ni.multi_cloud_image.show.href+"'\n"
+      str += "  multi_cloud_image find('"+ni.multi_cloud_image.show.name.gsub(/\'/,"\\\\'")+"', cloud_href: '" + cloud_href + "')\n"
+      # str += "  multi_cloud_image_href '"+ni.multi_cloud_image.show.href+"'\n"
     end 
 
     # Check to see if there is an ramdisk image link to export
     if !ni.raw["links"].detect{ |l| l["rel"] == "ramdisk_image" && l["inherited_source"] == nil}.nil?
-      str += "  # ramdisk_image '"+ni.ramdisk_image.show.name.gsub(/\'/,"\\\\'")+"'\n"
-      str += "  ramdisk_image_href '"+ni.ramdisk_image.show.href+"'\n"
+      str += "  ramdisk_image find('"+ni.ramdisk_image.show.name.gsub(/\'/,"\\\\'")+"', cloud_href: '" + cloud_href + "')\n"
+      # str += "  ramdisk_image_href '"+ni.ramdisk_image.show.href+"'\n"
     end 
 
     # Check to see if there is an ssh key link to export
     if !ni.raw["links"].detect{ |l| l["rel"] == "ssh_key" }.nil?
-      str += "  # ssh_key '"+ni.ssh_key.show.resource_uid.gsub(/\'/,"\\\\'")+"'\n"
-      str += "  ssh_key_href '"+ni.ssh_key.show.href+"'\n"
+      str += "  ssh_key find(resource_uid: '"+ni.ssh_key.show.resource_uid.gsub(/\'/,"\\\\'")+"', cloud_href: '" + cloud_href + "')\n"
+      # str += "  ssh_key_href '"+ni.ssh_key.show.href+"'\n"
     end 
 
     # Export the user_data if it's not blank
@@ -147,24 +188,9 @@ def instance_details_to_cat( ni )
       ni.raw["security_groups"].each_with_index do |sn, i|
         str += "'" + sn["href"] + "'"
         str += ", " if i != ni.raw["security_groups"].size - 1
-    end
+      end
       str += "\n"
     end
-
-    # Output the server template information
-    str += "  # server_template find('"+st.name.gsub(/\'/,"\\\\'")+"', revision: "+st.revision.to_s()+")\n"
-    str += "  server_template_href '"+st.href+"'\n"
-
-    # For each input, check to see if this input is in the ServerTemplate with the same value
-    #  If so, skip it, since it appears to be inherited anyway
-    inputs = ni.inputs.index(:view=>"inputs_2_0")
-    str += "  inputs do {\n"
-    inputs.each do |i|
-      if st.raw["inputs"].find{ |sti| sti["name"] == i.name && sti["value"] == i.value }.nil?  
-        str += "    '"+i.name+"' => '"+i.value.gsub(/\'/,"\\\\'")+"',\n" if i.value != "blank"
-      end
-    end 
-    str += "  } end\n"
 
     str
 end
@@ -181,7 +207,11 @@ File.open(dep.name.gsub(/[^\w\s_-]+/, '')+'.cat.rb','w') do |f|
   # Output the metadata of this CloudApp
   f.puts "name '"+dep.name.gsub(/\'/,"\\\\'")+"'"
   f.puts "rs_ca_ver 20131202"
-  f.puts "short_description '"+dep.description.gsub(/\'/,"\\\\'")+"'"
+
+  # Use the deployment name if the desc is blank
+  desc = dep.description.gsub(/\'/,"\\\\'")
+  desc = dep.name.gsub(/\'/,"\\\\'") if desc == '' 
+  f.puts "short_description '"+desc+"'"
 
   # For each Server in the deployment (regardless of its status)
   servers = dep.servers.index
@@ -201,6 +231,23 @@ File.open(dep.name.gsub(/[^\w\s_-]+/, '')+'.cat.rb','w') do |f|
     f.puts(server_array_to_cat(sa, rname))
     f.flush
   end
+
+  # Iterate through all clouds to get instances in the deployment
+  instances = []
+  client.clouds.index.each do |c|
+    inst = c.instances.index(:filter=>"deployment_href=="+dep.href,:view=>'full')
+    instances += inst
+  end
+
+  # Delete instances with a parent (parent means they're from a Server or ServerArray)
+  instances.delete_if { |i| i.raw["links"].detect{ |l| l["rel"] == "parent" } }
+  scount = 0
+  instances.each do |i|
+    rname = "instance_" + (scount+=1).to_s
+    f.puts(instance_to_cat(i, rname))
+    f.flush
+  end
+
 end
 
 end
