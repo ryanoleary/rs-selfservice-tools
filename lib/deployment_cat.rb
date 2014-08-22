@@ -15,6 +15,7 @@ def server_array_to_cat( sa, rname )
     ni = sa.show.next_instance.show(:view=>"full")
 
     str += instance_details_to_cat(ni)
+    str += server_template_details_to_cat(ni)
 
     if sa.raw["optimized"]
       str += "  optimized '"+sa.optimized+"'\n"
