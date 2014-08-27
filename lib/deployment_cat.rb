@@ -150,7 +150,7 @@ def instance_details_to_cat( ni )
 
     # Check to see if there is an multi cloud image link to export
     if !ni.raw["links"].detect{ |l| l["rel"] == "multi_cloud_image" && l["inherited_source"] == nil}.nil?
-      str += "  multi_cloud_image find('"+ni.multi_cloud_image.show.name.gsub(/\'/,"\\\\'")+"', cloud_href: '" + cloud_href + "')\n"
+      str += "  multi_cloud_image find('"+ni.multi_cloud_image.show.name.gsub(/\'/,"\\\\'")+"', revision: " + ni.multi_cloud_image.show.revision.to_s + ")\n"
       # str += "  multi_cloud_image_href '"+ni.multi_cloud_image.show.href+"'\n"
     end 
 
