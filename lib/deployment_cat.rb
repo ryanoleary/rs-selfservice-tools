@@ -106,6 +106,7 @@ def server_template_details_to_cat( ni )
     #  If so, skip it, since it appears to be inherited anyway
     inputs = ni.inputs.index(:view=>"inputs_2_0")
     str += "  inputs do {\n"
+    inputs = inputs.sort_by {|a| a.name.downcase}
     inputs.each do |i|
       if st.raw["inputs"].find{ |sti| sti["name"] == i.name && sti["value"] == i.value }.nil?  
         str += "    '"+i.name+"' => '"+i.value.gsub(/\'/,"\\\\'")+"',\n" if i.value != "blank"
