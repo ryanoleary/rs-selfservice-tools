@@ -127,25 +127,25 @@ def instance_details_to_cat( ni )
 
     # Check to see if there is a datacenter link to export
     if !ni.raw["links"].detect{ |l| l["rel"] == "datacenter" && l["inherited_source"] == nil}.nil?
-      str += "  datacenter find('"+ni.datacenter.show.name.gsub(/\'/,"\\\\'")+"', cloud_href: '" + cloud_href + "')\n"
+      str += "  datacenter '"+ni.datacenter.show.name.gsub(/\'/,"\\\\'")+"'\n"
       # str += "  datacenter_href '"+ni.datacenter.show.href+"'\n"
     end
 
     # Check to see if there is a image link to export
     if !ni.raw["links"].detect{ |l| l["rel"] == "image" && l["inherited_source"] == nil}.nil?
-      str += "  image find('"+ni.image.show.name.gsub(/\'/,"\\\\'")+"', cloud_href: '" + cloud_href + "')\n"
+      str += "  image '"+ni.image.show.name.gsub(/\'/,"\\\\'")+"'\n"
       # str += "  image_href '"+ni.image.show.href+"'\n"
     end
 
     # Check to see if there is an instance type link to export
     if !ni.raw["links"].detect{ |l| l["rel"] == "instance_type" && l["inherited_source"] == nil}.nil?
-      str += "  instance_type find('"+ni.instance_type.show.name.gsub(/\'/,"\\\\'")+"', cloud_href: '" + cloud_href + "')\n"
+      str += "  instance_type '"+ni.instance_type.show.name.gsub(/\'/,"\\\\'")+"'\n"
       # str += "  instance_type_href '"+ni.instance_type.show.href+"'\n"
     end 
 
     # Check to see if there is an kernel type link to export
     if !ni.raw["links"].detect{ |l| l["rel"] == "kernel_image" && l["inherited_source"] == nil}.nil?
-      str += "  kernel_image find('"+ni.kernel_image.show.name.gsub(/\'/,"\\\\'")+"', cloud_href: '" + cloud_href + "')\n"
+      str += "  kernel_image '"+ni.kernel_image.show.name.gsub(/\'/,"\\\\'")+"'\n"
       # str += "  kernel_image_href '"+ni.kernel_image.show.href+"'\n"
     end 
 
@@ -157,13 +157,13 @@ def instance_details_to_cat( ni )
 
     # Check to see if there is an ramdisk image link to export
     if !ni.raw["links"].detect{ |l| l["rel"] == "ramdisk_image" && l["inherited_source"] == nil}.nil?
-      str += "  ramdisk_image find('"+ni.ramdisk_image.show.name.gsub(/\'/,"\\\\'")+"', cloud_href: '" + cloud_href + "')\n"
+      str += "  ramdisk_image '"+ni.ramdisk_image.show.name.gsub(/\'/,"\\\\'")+"'\n"
       # str += "  ramdisk_image_href '"+ni.ramdisk_image.show.href+"'\n"
     end 
 
     # Check to see if there is an ssh key link to export
     if !ni.raw["links"].detect{ |l| l["rel"] == "ssh_key" }.nil?
-      str += "  ssh_key find(resource_uid: '"+ni.ssh_key.show.resource_uid.gsub(/\'/,"\\\\'")+"', cloud_href: '" + cloud_href + "')\n"
+      str += "  ssh_key '"+ni.ssh_key.show.resource_uid.gsub(/\'/,"\\\\'")+"'\n"
       # str += "  ssh_key_href '"+ni.ssh_key.show.href+"'\n"
     end 
 
@@ -175,9 +175,17 @@ def instance_details_to_cat( ni )
     # Subnets and security groups aren't proper links in right_api_client, so instead
     #  just use the href values for these
     if !ni.raw["subnets"].nil? && ni.raw["subnets"].size > 0
-      str += "  subnet_hrefs "
+      str += "  subnets "
       ni.raw["subnets"].each_with_index do |sn, i|
-        str += "'" + sn["href"] + "'"
+        snr = @client.resource(sn["href"])
+
+        # Check to see if more than one subnet with this name exists in the cloud. If so, use find with the network_href
+        if snr.network.show.cloud.show.subnets.index(:filter=>"name==#{snr.name}").length == 1
+          str += "'" + snr.name + "'"
+        else
+          str += "find('" + snr.name + "', network_href: '" + snr.network.href + "')"
+        end
+
         str += ", " if i != ni.raw["subnets"].size - 1
       end
       str += "\n"
@@ -186,9 +194,17 @@ def instance_details_to_cat( ni )
     # Subnets and security groups aren't proper links in right_api_client, so instead
     #  just use the href values for these
     if !ni.raw["security_groups"].nil?
-      str += "  security_group_hrefs "
+      str += "  security_groups "
       ni.raw["security_groups"].each_with_index do |sn, i|
-        str += "'" + sn["href"] + "'"
+        sgr = @client.resource(sn["href"])
+
+        # Check to see if more than one SG with this name exists in the cloud. If so, use find with the network_href
+        if sgr.cloud.show.security_groups.index(:filter=>"name==#{sgr.name}").length == 1
+          str += "'" + sgr.name + "'"
+        else
+          str += "find('" + sgr.name + "', network_href: '" + sgr.network.href + "')"
+        end
+
         str += ", " if i != ni.raw["security_groups"].size - 1
       end
       str += "\n"
