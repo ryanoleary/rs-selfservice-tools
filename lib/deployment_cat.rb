@@ -180,7 +180,7 @@ def instance_details_to_cat( ni )
         snr = @client.resource(sn["href"])
 
         # Check to see if more than one subnet with this name exists in the cloud. If so, use find with the network_href
-        if snr.network.show.cloud.show.subnets.index(:filter=>"name==#{snr.name}").length == 1
+        if snr.network.show.cloud.show.subnets.index(:filter=>["name==#{snr.name}"]).length == 1
           str += "'" + snr.name + "'"
         else
           str += "find('" + snr.name + "', network_href: '" + snr.network.href + "')"
@@ -199,7 +199,7 @@ def instance_details_to_cat( ni )
         sgr = @client.resource(sn["href"])
 
         # Check to see if more than one SG with this name exists in the cloud. If so, use find with the network_href
-        if sgr.cloud.show.security_groups.index(:filter=>"name==#{sgr.name}").length == 1
+        if sgr.cloud.show.security_groups.index(:filter=>["name==#{sgr.name}"]).length == 1
           str += "'" + sgr.name + "'"
         else
           str += "find('" + sgr.name + "', network_href: '" + sgr.network.href + "')"
@@ -253,7 +253,7 @@ File.open(dep.name.gsub(/[^\w\s_-]+/, '')+'.cat.rb','w') do |f|
   # Iterate through all clouds to get instances in the deployment
   instances = []
   client.clouds.index.each do |c|
-    inst = c.instances.index(:filter=>"deployment_href=="+dep.href,:view=>'full')
+    inst = c.instances.index(:filter=>["deployment_href=="+dep.href],:view=>'full')
     instances += inst
   end
 
