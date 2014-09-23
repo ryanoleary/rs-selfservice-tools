@@ -16,18 +16,20 @@ Provides a small set of tools to help you use RS Self Service
 ### Deployment to CAT
 Export all resources in an existing deployment to a CAT file format
 
-    ruby export_deployment.rb <options>
+  ruby export_deployment.rb <options>
     -d, --deployment ID              Deployment ID
     -e, --email EMAIL_ADDRESS        Email Address
     -p, --password PASSWORD          Password
     -a, --account ID                 Account ID
-
-Notes: Subnets and SecurityGroups are not exported due to [this bug](http://bit.ly/1f7AEZa)
+    -i, --deployment_inputs          Export deployment inputs to the deployment
+                                     (instead of each individual server/array)
+    -c, --concurrent_launch          Export RCL code to concurrently launch resources
+                                     (to override the default of sequential)
 
 ### Show Cloud Hrefs
 Print a readable list of all resource hrefs for all cloud resources in an account
 
-		ruby show_cloud_hrefs.rb <options>
+  ruby show_cloud_hrefs.rb <options>
     -e, --email EMAIL_ADDRESS        Email Address
     -p, --password PASSWORD          Password
     -a, --account ID                 Account ID
