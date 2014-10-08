@@ -180,8 +180,11 @@ def instance_details_to_cat( ni )
     ni.raw["subnets"].each_with_index do |sn, i|
       snr = @client.resource(sn["href"])
 
+      # If the name is nil, use the resource_uid and network href
+      if !snr.name
+          str += "find(resource_uid: '" + snr.resource_uid + "', network_href: '" + snr.network.href + "')"
       # Not all subnets have networks to check, so if not, just use the name
-      if !snr.raw["links"].detect{ |l| l["rel"] == "network" }.nil?
+      elsif !snr.raw["links"].detect{ |l| l["rel"] == "network" }.nil?
         # Check to see if more than one subnet with this name exists in the cloud. If so, use find with the network_href
         if snr.network.show.cloud.show.subnets.index(:filter=>["name==#{snr.name}"]).length == 1
           str += "'" + snr.name + "'"
