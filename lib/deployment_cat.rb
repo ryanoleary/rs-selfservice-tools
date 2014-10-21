@@ -317,7 +317,7 @@ def concurrent_resource_launch(resources)
 
   str += "  concurrent do \n"
   resources.each do |r|
-    str += "    launch(@@global_" + r + ")\n" 
+    str += "    provision(@@global_" + r + ")\n" 
   end
   str += "  end \n"
 
