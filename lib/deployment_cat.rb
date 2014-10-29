@@ -346,15 +346,19 @@ def deployment_inputs_to_cat()
 
   str = "\n\n"
 
-  str += "  $inp = {\n"
   inputs = @dep.raw["inputs"].select{ |i| i["value"] != "blank"}
-  inputs.each_with_index do |input, i|
-    str += "    '" + input["name"] + "':'" + input["value"] + "',"
-    str += "," if i != inputs.size - 1
-    str += "\n"
+  if inputs.size > 0
+    str += "  $inp = {\n"
+    inputs.each_with_index do |input, i|
+      str += "    '" + input["name"] + "':'" + input["value"] + "',"
+      str += "," if i != inputs.size - 1
+      str += "\n"
+    end
+    str += "  } \n"
+    str += "  @@deployment.multi_update_inputs(inputs: $inp) \n"
+  else
+    str += "  # No deployment level inputs found \n"
   end
-  str += "  } \n"
-  str += "  @@deployment.multi_update_inputs(inputs: $inp) \n"
   str
 end
 
