@@ -128,7 +128,11 @@ def instance_details_to_cat( ni )
 
   # Check to see if there is a datacenter link to export
   if !ni.raw["links"].detect{ |l| l["rel"] == "datacenter" && l["inherited_source"] == nil}.nil?
-    str += "  datacenter '"+ni.datacenter.show.name.gsub(/\'/,"\\\\'")+"'\n"
+    begin
+      str += "  datacenter '"+ni.datacenter.show.name.gsub(/\'/,"\\\\'")+"'\n"
+    rescue
+      str += "  # datacenter ** NOT ABLE TO EXPORT **\n"
+    end
     # str += "  datacenter_href '"+ni.datacenter.show.href+"'\n"
   end
 
@@ -164,7 +168,11 @@ def instance_details_to_cat( ni )
 
   # Check to see if there is an ssh key link to export
   if !ni.raw["links"].detect{ |l| l["rel"] == "ssh_key" }.nil?
-    str += "  ssh_key '"+ni.ssh_key.show.resource_uid.gsub(/\'/,"\\\\'")+"'\n"
+    begin
+      str += "  ssh_key '"+ni.ssh_key.show.resource_uid.gsub(/\'/,"\\\\'")+"'\n"
+    rescue
+      str += "  # ssh_key ** NOT ABLE TO EXPORT **\n"
+    end
     # str += "  ssh_key_href '"+ni.ssh_key.show.href+"'\n"
   end 
 
@@ -175,29 +183,34 @@ def instance_details_to_cat( ni )
 
   # Subnets and security groups aren't proper links in right_api_client, so instead
   #  just use the href values for these
+  # If we have problems getting any subnet, just ignore them all and print an error
   if !ni.raw["subnets"].nil? && ni.raw["subnets"].size > 0
-    str += "  subnets "
-    ni.raw["subnets"].each_with_index do |sn, i|
-      snr = @client.resource(sn["href"])
+    begin
+      substr = "  subnets "
+      ni.raw["subnets"].each_with_index do |sn, i|
+        snr = @client.resource(sn["href"])
 
-      # If the name is nil, use the resource_uid and network href
-      if !snr.name
-          str += "find(resource_uid: '" + snr.resource_uid + "', network_href: '" + snr.network.href + "')"
-      # Not all subnets have networks to check, so if not, just use the name
-      elsif !snr.raw["links"].detect{ |l| l["rel"] == "network" }.nil?
-        # Check to see if more than one subnet with this name exists in the cloud. If so, use find with the network_href
-        if snr.network.show.cloud.show.subnets.index(:filter=>["name==#{snr.name}"]).length == 1
-          str += "'" + snr.name + "'"
+        # If the name is nil, use the resource_uid and network href
+        if !snr.name
+            substr += "find(resource_uid: '" + snr.resource_uid + "', network_href: '" + snr.network.href + "')"
+        # Not all subnets have networks to check, so if not, just use the name
+        elsif !snr.raw["links"].detect{ |l| l["rel"] == "network" }.nil?
+          # Check to see if more than one subnet with this name exists in the cloud. If so, use find with the network_href
+          if snr.network.show.cloud.show.subnets.index(:filter=>["name==#{snr.name}"]).length == 1
+            substr += "'" + snr.name + "'"
+          else
+            substr += "find('" + snr.name + "', network_href: '" + snr.network.href + "')"
+          end
         else
-          str += "find('" + snr.name + "', network_href: '" + snr.network.href + "')"
+          substr += "'" + snr.name + "'"
         end
-      else
-        str += "'" + snr.name + "'"
-      end
 
-      str += ", " if i != ni.raw["subnets"].size - 1
+        substr += ", " if i != ni.raw["subnets"].size - 1
+      end
+      str += substr + "\n"
+    rescue
+      str += "  # subnets ** NOT ABLE TO EXPORT **\n"
     end
-    str += "\n"
   end
 
   # Subnets and security groups aren't proper links in right_api_client, so instead
