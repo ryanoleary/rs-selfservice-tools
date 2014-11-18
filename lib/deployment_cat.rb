@@ -350,7 +350,7 @@ def deployment_inputs_to_cat()
   if inputs.size > 0
     str += "  $inp = {\n"
     inputs.each_with_index do |input, i|
-      str += "    '" + input["name"] + "':'" + input["value"] + "',"
+      str += "    '" + input["name"] + "':'" + input["value"] + "'"
       str += "," if i != inputs.size - 1
       str += "\n"
     end
