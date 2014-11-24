@@ -18,7 +18,7 @@ def server_array_to_cat( sa, rname )
   str += server_template_details_to_cat(ni)
 
   if sa.raw["optimized"]
-    str += "  optimized '"+sa.optimized+"'\n"
+    str += "  optimized '#{sa.optimized}'\n"
   end
   
   if sa.raw["state"]
