@@ -186,21 +186,19 @@ def instance_details_to_cat( ni )
   # If we have problems getting any subnet, just ignore them all and print an error
   if !ni.raw["subnets"].nil? && ni.raw["subnets"].size > 0
     begin
+
+      # First let's set the network_href for the resource (just use the first subnet for this - they should all be the same)
+      sn = ni.raw["subnets"][0]
+      snr = @client.resource(sn["href"])
+      str += "  network \"#{snr.network.show.name}\"\n"
+
       substr = "  subnets "
       ni.raw["subnets"].each_with_index do |sn, i|
         snr = @client.resource(sn["href"])
 
         # If the name is nil, use the resource_uid and network href
         if !snr.name
-            substr += "find(resource_uid: '" + snr.resource_uid + "', network_href: '" + snr.network.href + "')"
-        # Not all subnets have networks to check, so if not, just use the name
-        elsif !snr.raw["links"].detect{ |l| l["rel"] == "network" }.nil?
-          # Check to see if more than one subnet with this name exists in the cloud. If so, use find with the network_href
-          if snr.network.show.cloud.show.subnets.index(:filter=>["name==#{snr.name}"]).length == 1
-            substr += "'" + snr.name + "'"
-          else
-            substr += "find('" + snr.name + "', network_href: '" + snr.network.href + "')"
-          end
+            substr += "find(resource_uid: '" + snr.resource_uid + "')"
         else
           substr += "'" + snr.name + "'"
         end
@@ -220,12 +218,7 @@ def instance_details_to_cat( ni )
     ni.raw["security_groups"].each_with_index do |sn, i|
       sgr = @client.resource(sn["href"])
 
-      # Check to see if more than one SG with this name exists in the cloud. If so, use find with the network_href
-      if sgr.cloud.show.security_groups.index(:filter=>["name==#{sgr.name}"]).length == 1
-        str += "'" + sgr.name + "'"
-      else
-        str += "find('" + sgr.name + "', network_href: '" + sgr.network.href + "')"
-      end
+      str += "'" + sgr.name + "'"
 
       str += ", " if i != ni.raw["security_groups"].size - 1
     end
