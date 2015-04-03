@@ -108,9 +108,17 @@ def server_template_details_to_cat( ni )
   str += "  inputs do {\n"
   inputs = inputs.sort_by {|a| a.name.downcase}
   inputs.each do |i|
-    if st.raw["inputs"].find{ |sti| sti["name"] == i.name && sti["value"] == i.value }.nil? && 
-       ((@deployment_inputs && @dep.raw["inputs"].find{ |sti| sti["name"] == i.name && sti["value"] == i.value }.nil?) || !@deployment_inputs)
-      str += "    '"+i.name+"' => '"+i.value.gsub(/\'/,"\\\\'")+"',\n" if i.value != "blank"
+    # Check to see if this is already set on the ServerTemplate and has the same value, if so skip it
+    if st.raw["inputs"].find{ |sti| sti["name"] == i.name && sti["value"] == i.value }.nil?
+
+      # If deployment inputs is set, check to see if this exists at the deployment level, and if not add it
+      if @deployment_inputs && @dep.raw["inputs"].find{ |di| di["name"] == i.name }.nil?
+        @dep.raw["inputs"] << { "name" => i.name, "value" => i.value }
+      end
+
+      if ((@deployment_inputs && @dep.raw["inputs"].find{ |sti| sti["name"] == i.name && sti["value"] == i.value }.nil?) || !@deployment_inputs)
+        str += "    '"+i.name+"' => '"+i.value.gsub(/\'/,"\\\\'")+"',\n" if i.value != "blank"
+      end
     end
   end 
   str += "  } end\n"
