@@ -14,6 +14,7 @@ OptionParser.new do |opts|
   opts.on("-p", "--password PASSWORD", "Password") { |v| options[:password] = v }
   opts.on("-a", "--account ID", "Account ID") { |v| options[:account_id] = v }
   opts.on("-r", "--refresh REFRESH_TOKEN", "Refresh token") { |v| options[:refresh_token] = v }
+  opts.on("-u", "--url API_URL", "Host to connect to") { |v| options[:host] = v }
   opts.on("-i", "--deployment_inputs", "Set inputs at the deployment level" ) { |v| options[:deployment_inputs] = v }  
   opts.on("-c", "--concurrent_launch", "Set the resources to launch concurrently" ) { |v| options[:concurrent_launch] = v }  
 
@@ -27,9 +28,11 @@ end.parse!
 # Login to RightScale
 @deployment_id = options[:deployment_id]
 if options[:email] && options[:password]
-  @client = RightApi::Client.new(:email=>options[:email],:password=>options[:password],:account_id=>options[:account_id])
+  options[:host] ? api_url = options[:host] : api_url = "https://us-3.rightscale.com"
+  @client = RightApi::Client.new(:email=>options[:email],:password=>options[:password],:account_id=>options[:account_id],:api_url=>api_url)
 elsif options[:refresh_token]
-  @client = RightApi::Client.new(:refresh_token=>options[:refresh_token],:account_id=>options[:account_id])
+  options[:host] ? api_url = options[:host] : api_url = "https://us-3.rightscale.com"
+  @client = RightApi::Client.new(:refresh_token=>options[:refresh_token],:account_id=>options[:account_id],:api_url=>api_url)
 else
   puts "You must provide either email/password or refresh token"
   exit(1)
