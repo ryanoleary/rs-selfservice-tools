@@ -213,7 +213,7 @@ def instance_details_to_cat( ni )
 
   # Subnets and security groups aren't proper links in right_api_client, so instead
   #  just use the href values for these
-  if !ni.raw["security_groups"].nil?
+  if !ni.raw["security_groups"].nil? && ni.raw["security_groups"].size > 0
     str += "  security_groups "
     ni.raw["security_groups"].each_with_index do |sn, i|
       sgr = @client.resource(sn["href"])
@@ -317,19 +317,17 @@ def concurrent_resource_launch(resources)
 
   str = ""
 
-  resources.each do |r|
-    str += "  @@global_" + r + " = @" + r + "\n"
+  str += "  concurrent return "
+  resources.each_with_index do |r, i|
+    str += " @" + r 
+    str += "," if i != resources.size - 1    
   end
 
-  str += "  concurrent do \n"
+  str += " do \n"
   resources.each do |r|
-    str += "    provision(@@global_" + r + ")\n" 
+    str += "    provision(@" + r + ")\n" 
   end
   str += "  end \n"
-
-  resources.each do |r|
-    str += "  @" + r + " = @@global_" + r + "\n"
-  end
 
   str
 end
