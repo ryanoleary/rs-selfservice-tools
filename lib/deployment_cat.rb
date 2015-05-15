@@ -68,7 +68,7 @@ def server_to_cat( s, rname )
   str += server_template_details_to_cat(ni)
 
   if s.raw["optimized"]
-    str += "  optimized '"+s.optimized+"'\n"
+    str += "  optimized '"+s.optimized.to_s+"'\n"
   end
   
   str += "end\n"
