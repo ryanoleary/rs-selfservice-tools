@@ -96,6 +96,19 @@ cloud_hrefs_to_mappings.rb --url 'https://us-4.rightscale.com' \
   --refresh 'abc..123'
 ```
 
+### Convert a CloudFormation Template to CAT
+
+`cft_to_cat.rb --help`
+```
+Usage: cft_to_cat.rb [options]
+    -f, --file FILE_NAME             Filename of the CFT file
+    -h, --help                       Display this screen
+```
+
+Example:
+
+`cft_to_cat.rb -f contrib/cft/cloudformation-templates-us-west-1/EC2InstanceWithSecurityGroupSample.template`
+
 ## Todo
 
 * Support for Volumes, VolumeAttachments with optional flag
