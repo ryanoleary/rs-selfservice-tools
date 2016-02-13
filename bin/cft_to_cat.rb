@@ -5,7 +5,7 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'rubygems'
 require 'json'
 require 'pp'
-require 'convert_cft_to_cat.rb'
+require 'convert_cft_to_cat'
 require 'optparse'
 
 options = {}
